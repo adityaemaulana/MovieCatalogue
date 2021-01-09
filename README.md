@@ -9,10 +9,10 @@ Movies and TV Shows listing app. The app available for online-offline uses by im
 </p>
 
 ### Dependencies
-Room 2.2.3
-Paging 2.1.1
-Retrofit 2.9.0
-OkHttp 4.9.0
-Navigation 2.3.2
-Espresso 3.3.0
-Mockito 3.6.0
+* Room 2.2.3
+* Paging 2.1.1
+* Retrofit 2.9.0
+* OkHttp 4.9.0
+* Navigation 2.3.2
+* Espresso 3.3.0
+* Mockito 3.6.0
