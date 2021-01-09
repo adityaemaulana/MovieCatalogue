@@ -1,24 +1,29 @@
 package com.example.moviecatalogue.ui.movie
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.moviecatalogue.R
-import com.example.moviecatalogue.data.FilmEntity
+import com.example.moviecatalogue.data.source.local.entity.FilmEntity
 import com.example.moviecatalogue.databinding.ItemMovieBinding
-import com.example.moviecatalogue.ui.detail.DetailFilmActivity
 
 class MovieAdapter(private val callback: MovieFragmentCallback) :
-    RecyclerView.Adapter<MovieAdapter.MovieVH>() {
-    private var listMovies = ArrayList<FilmEntity>()
+    PagedListAdapter<FilmEntity, MovieAdapter.MovieVH>(DIFF_CALLBACK) {
 
-    fun setMovies(films: List<FilmEntity>?) {
-        if (films == null) return
-        this.listMovies.clear()
-        this.listMovies.addAll(films)
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<FilmEntity>() {
+            override fun areItemsTheSame(oldItem: FilmEntity, newItem: FilmEntity): Boolean {
+                return oldItem.filmId == newItem.filmId
+            }
+
+            override fun areContentsTheSame(oldItem: FilmEntity, newItem: FilmEntity): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieVH {
@@ -28,11 +33,11 @@ class MovieAdapter(private val callback: MovieFragmentCallback) :
     }
 
     override fun onBindViewHolder(holder: MovieVH, position: Int) {
-        val movie = listMovies[position]
-        holder.bind(movie)
+        val movie = getItem(position)
+        if (movie != null) {
+            holder.bind(movie)
+        }
     }
-
-    override fun getItemCount(): Int = listMovies.size
 
     inner class MovieVH(private val binding: ItemMovieBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -50,6 +55,4 @@ class MovieAdapter(private val callback: MovieFragmentCallback) :
             }
         }
     }
-
-
 }

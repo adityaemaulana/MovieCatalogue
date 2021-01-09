@@ -1,41 +1,40 @@
 package com.example.moviecatalogue.ui.detail
 
-import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.example.moviecatalogue.data.FilmEntity
-import com.example.moviecatalogue.data.GenreEntity
-import com.example.moviecatalogue.utils.DataDummy
+import com.example.moviecatalogue.data.FilmRepository
+import com.example.moviecatalogue.data.source.local.entity.FilmWithGenre
+import com.example.moviecatalogue.vo.Resource
 
-class DetailFilmViewModel : ViewModel() {
-    private lateinit var filmId: String
-    private lateinit var film: FilmEntity
+class DetailFilmViewModel(private val filmRepository: FilmRepository) : ViewModel() {
+    private val filmId = MutableLiveData<Int>()
     private var type = 0
 
     fun setType(type: Int) {
         this.type = type
     }
 
-    fun setSelectedFilm(filmId: String) {
-        this.filmId = filmId
+    fun setSelectedFilm(filmId: Int) {
+        this.filmId.value = filmId
     }
 
-
-    fun getFilm(): FilmEntity {
-        if (type == DetailFilmActivity.TYPE_MOVIE) {
-            for (f in DataDummy.generateDummyMovies()) {
-                if (f.filmId == filmId) film = f
-            }
-        } else if (type == DetailFilmActivity.TYPE_TVSHOW) {
-            for (f in DataDummy.generateDummyTVShows()) {
-                if (f.filmId == filmId) film = f
-            }
+    var filmWithGenre: LiveData<Resource<FilmWithGenre>> =
+        Transformations.switchMap(filmId) { mFilmId ->
+            filmRepository.getFilmWithGenres(mFilmId, type)
         }
 
-        return film
-    }
+    fun setBookmark() {
+        val filmResource = filmWithGenre.value
+        if (filmResource != null) {
+            val filmWithGenre = filmResource.data
 
-    fun getGenres(): List<GenreEntity> {
-        val genres = DataDummy.generateDummyGenres(filmId)
-        return genres
+            if (filmWithGenre != null) {
+                val filmEntity = filmWithGenre.mFilm
+                val newState = !filmEntity.bookmarked
+                filmRepository.setFilmBookmark(filmEntity, newState)
+            }
+        }
     }
 }

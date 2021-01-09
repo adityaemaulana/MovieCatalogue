@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.moviecatalogue">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"
@@ -15,14 +15,14 @@
         android:theme="@style/Theme.MovieCatalogue"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.example.moviecatalogue.ui.detail.DetailFilmActivity"
+            android:name=".ui.detail.DetailFilmActivity"
             android:label="@string/title_activity_detail_film"
             android:theme="@style/Theme.MovieCatalogue.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.moviecatalogue.ui.home.HomeActivity" />
         </activity>
-        <activity android:name="com.example.moviecatalogue.ui.home.HomeActivity">
+        <activity android:name=".ui.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

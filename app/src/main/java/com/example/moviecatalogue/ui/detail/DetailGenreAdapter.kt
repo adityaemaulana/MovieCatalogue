@@ -3,7 +3,7 @@ package com.example.moviecatalogue.ui.detail
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.moviecatalogue.data.GenreEntity
+import com.example.moviecatalogue.data.source.local.entity.GenreEntity
 import com.example.moviecatalogue.databinding.ItemGenreBinding
 
 class DetailGenreAdapter : RecyclerView.Adapter<DetailGenreAdapter.DetailGenreVH>() {

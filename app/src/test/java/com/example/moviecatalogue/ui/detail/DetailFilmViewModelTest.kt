@@ -1,50 +1,55 @@
 package com.example.moviecatalogue.ui.detail
 
-import com.example.moviecatalogue.data.FilmEntity
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.example.moviecatalogue.data.FilmRepository
+import com.example.moviecatalogue.data.source.local.entity.FilmWithGenre
+import com.example.moviecatalogue.utils.Constants.Companion.TYPE_MOVIE
+import com.example.moviecatalogue.utils.DataDummy
+import com.example.moviecatalogue.vo.Resource
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.junit.MockitoJUnitRunner
 
+@RunWith(MockitoJUnitRunner::class)
 class DetailFilmViewModelTest {
     private lateinit var viewModel: DetailFilmViewModel
-
-    private val dummyFilm = FilmEntity("m1",
-            "A Star Is Born",
-            "Rilis",
-            "Inggris",
-            "05/10/2018",
-            "Seorang bintang musik country yang karirnya mulai memudar, Jackson Maine (Bradley Cooper) menemukan sebuah talenta yang sangat berbakat di dalam diri dari seorang musisi muda bernama Ally (Lady Gaga). Maine berhasil mengorbitkan Ally menjadi seorang bintang muda yang menjanjikan. Namun keduanya terlibat hubungan yang lebih jauh dari sekedar mentor dan anak didik. Seiring dengan meroketnya karir dari Ally dan dirinya, Maine mengalami dilema mengenai masalah ini.",
-            "https://image.tmdb.org/t/p/w600_and_h900_bestv2/wrFpXMNBRj2PBiN4Z5kix51XaIZ.jpg")
+    private val dummyFilm = DataDummy.generateDummyMovies()[0]
     private val filmId = dummyFilm.filmId
+
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @Mock
+    private lateinit var filmRepository: FilmRepository
+
+    @Mock
+    private lateinit var observer: Observer<Resource<FilmWithGenre>>
 
     @Before
     fun setUp() {
-        viewModel = DetailFilmViewModel()
-        viewModel.setType(DetailFilmActivity.TYPE_MOVIE)
+        viewModel = DetailFilmViewModel(filmRepository)
+        viewModel.setType(TYPE_MOVIE)
         viewModel.setSelectedFilm(filmId)
     }
 
     @Test
-    fun getFilm() {
-        viewModel.setSelectedFilm(filmId)
+    fun getFilmWithGenres() {
+        val dummyFilmWithGenres =
+            Resource.success(DataDummy.generateDummyFilmWithGenres(dummyFilm, true))
+        val film = MutableLiveData<Resource<FilmWithGenre>>()
+        film.value = dummyFilmWithGenres
 
-        val filmEntity = viewModel.getFilm()
+        `when`(filmRepository.getFilmWithGenres(filmId, TYPE_MOVIE)).thenReturn(film)
 
-        assertNotNull(filmEntity)
-        assertEquals(dummyFilm.title, filmEntity.title)
-        assertEquals(dummyFilm.releaseDate, filmEntity.releaseDate)
-        assertEquals(dummyFilm.status, filmEntity.status)
-        assertEquals(dummyFilm.language, filmEntity.language)
-        assertEquals(dummyFilm.description, filmEntity.description)
-        assertEquals(dummyFilm.imagePath, filmEntity.imagePath)
-    }
+        viewModel.filmWithGenre.observeForever(observer)
 
-    @Test
-    fun getGenres() {
-        val genreEntities = viewModel.getGenres()
-
-        assertNotNull(genreEntities)
-        assertEquals(5, genreEntities.size)
+        verify(observer).onChanged(dummyFilmWithGenres)
     }
 }
